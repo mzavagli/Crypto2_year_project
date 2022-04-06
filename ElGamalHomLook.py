@@ -23,11 +23,9 @@ public_key = private_key * g
 
 def generate_lookup_table(start, end, thread_name):
     lookup_table = []
-    curr_g = start*g
     if start == 0:
-        lookup_table.append(f'{str(0)}:{0}')
-        curr_g = g
-        start += 1
+        start = 2
+    curr_g = (start-1)*g
     for i in range(start, end):
         curr_g += g
         lookup_table.append(f'{str(curr_g)}:{i}')
@@ -46,7 +44,6 @@ def fastSearchInFile(data):
         mid = (lo + hi) // 2
         curr_line = linecache.getline(FILE_NAME, mid).split(":")
         cmp_value = curr_line[0]
-        print(mid)
         if data < cmp_value:
             hi = mid - 1
         elif data > cmp_value:
@@ -57,6 +54,8 @@ def fastSearchInFile(data):
 
 
 def bsgs_ecdlp(M):
+    if str(M) == "00":
+        return 0
     if M == g:
         return 1
     # Giant Step
@@ -65,7 +64,7 @@ def bsgs_ecdlp(M):
         print(temp)
         lookup_table_res = fastSearchInFile(temp)
         if lookup_table_res:
-            return ((i*m + lookup_table_res) % o) + 1
+            return ((i*m + lookup_table_res) % o)
     return None
 
 
@@ -96,6 +95,6 @@ if GENERATE:
     divided_m = ceil(m/THREAD_NUMBER)
     with Pool(THREAD_NUMBER) as p:
         p.starmap(generate_lookup_table, [(i*divided_m, (i+1)*divided_m, f"process_{i}") for i in range(THREAD_NUMBER)])
-
-# run
-print(f'decrypt(encrypt(592)) = {decrypt_bsgs(encrypt(592))}')
+else:
+    # run
+    print(f'decrypt(encrypt(54654)) = {decrypt_bsgs(encrypt(54654))}')

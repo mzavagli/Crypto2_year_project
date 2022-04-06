@@ -1,4 +1,4 @@
-table_names = ("merged1", "merged2")  # name of the 2 tabs to merge
+table_names = ("merge1", "merge2")  # name of the 2 tabs to merge
 
 outfile = open("table_final", "w")  # name of the output file
 pre1 = ""
