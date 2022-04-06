@@ -19,11 +19,11 @@ with open(f'table_{table_names[0]}') as infile1, open(f'table_{table_names[1]}')
                 break
             else:
                 for line in infile2.readlines():
-                    outfile.write(line)
+                    outfile.write(f'{line}\n')
                 break
         if not line_file2:
             for line in infile1.readlines():
-                outfile.write(line)
+                outfile.write(f'{line}\n')
             break
         if line_file1 < line_file2:
             outfile.write(line_file1)
