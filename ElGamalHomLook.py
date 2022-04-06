@@ -2,8 +2,12 @@ from petlib.ec import EcGroup
 from math import ceil, sqrt
 from multiprocessing import Pool
 import os
+import linecache
 
 THREAD_NUMBER = 4
+NUMBER_LINE_INFILE = 3999997
+FILE_NAME = "table_final"
+GENERATE = False
 
 # EC setup
 CURVENUMBER = 714
@@ -32,24 +36,36 @@ def generate_lookup_table(start, end, thread_name):
         f.write(os.linesep.join(lookup_table))
 
 
+def fastSearchInFile(data):
+    data = str(data)
+    lo = 0
+    hi = NUMBER_LINE_INFILE-1
+    pre_line = ""
+    curr_line = "0"
+    while pre_line != curr_line:
+        mid = (lo + hi) // 2
+        curr_line = linecache.getline(FILE_NAME, mid).split(":")
+        cmp_value = curr_line[0]
+        print(mid)
+        if data < cmp_value:
+            hi = mid - 1
+        elif data > cmp_value:
+            lo = mid + 1
+        else:
+            return int(curr_line[1])
+    return False
+
+
 def bsgs_ecdlp(M):
-    global divided_m
     if M == g:
         return 1
-    m = ceil(sqrt(o))
-    m = 4000000
-    # Baby Steps: Lookup Table
-    # lookup_table = {j * g: j for j in range(m)} # LOOOOL c'est beaucoup trop long
-    divided_m = ceil(m/THREAD_NUMBER)
-    with Pool(THREAD_NUMBER) as p:
-        p.starmap(generate_lookup_table, [(i*divided_m, (i+1)*divided_m, f"process_{i}") for i in range(THREAD_NUMBER)])
     # Giant Step
-    """
     for i in range(m):
         temp = M - (i*m)*g
-        if temp in lookup_table:
-            return (i*m + lookup_table[temp]) % o
-    """
+        print(temp)
+        lookup_table_res = fastSearchInFile(temp)
+        if lookup_table_res:
+            return ((i*m + lookup_table_res) % o) + 1
     return None
 
 
@@ -72,4 +88,14 @@ def add(elem1, elem2):
     return (c11 + c21, c12 + c22)
 
 
-print(f'decrypt(encrypt(2)) = {decrypt_bsgs(encrypt(2))}')
+# Baby Steps: Lookup Table
+# m = ceil(sqrt(o))
+m = 4000000
+# lookup_table = {j * g: j for j in range(m)} # LOOOOL c'est beaucoup trop long
+if GENERATE:
+    divided_m = ceil(m/THREAD_NUMBER)
+    with Pool(THREAD_NUMBER) as p:
+        p.starmap(generate_lookup_table, [(i*divided_m, (i+1)*divided_m, f"process_{i}") for i in range(THREAD_NUMBER)])
+
+# run
+print(f'decrypt(encrypt(592)) = {decrypt_bsgs(encrypt(592))}')
