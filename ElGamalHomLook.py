@@ -1,13 +1,8 @@
 from petlib.ec import EcGroup
-from math import ceil, sqrt
-from multiprocessing import Pool
-import os
 import linecache
 
-THREAD_NUMBER = 4
 NUMBER_LINE_INFILE = 3999997
 FILE_NAME = "table_final"
-GENERATE = False
 
 # EC setup
 CURVENUMBER = 714
@@ -15,23 +10,12 @@ CURVENUMBER = 714
 group = EcGroup(CURVENUMBER)
 g = group.generator()
 o = group.order()
+# m = ceil(sqrt(o))
+m = 4000000
 
 # key setup
 private_key = o.random()
 public_key = private_key * g
-
-
-def generate_lookup_table(start, end, thread_name):
-    lookup_table = []
-    if start == 0:
-        start = 2
-    curr_g = (start-1)*g
-    for i in range(start, end):
-        curr_g += g
-        lookup_table.append(f'{str(curr_g)}:{i}')
-    with open(f"table_{start}", "w") as f:
-        lookup_table.sort()
-        f.write(os.linesep.join(lookup_table))
 
 
 def fastSearchInFile(data):
@@ -87,14 +71,11 @@ def add(elem1, elem2):
     return (c11 + c21, c12 + c22)
 
 
-# Baby Steps: Lookup Table
-# m = ceil(sqrt(o))
-m = 4000000
-# lookup_table = {j * g: j for j in range(m)} # LOOOOL c'est beaucoup trop long
-if GENERATE:
-    divided_m = ceil(m/THREAD_NUMBER)
-    with Pool(THREAD_NUMBER) as p:
-        p.starmap(generate_lookup_table, [(i*divided_m, (i+1)*divided_m, f"process_{i}") for i in range(THREAD_NUMBER)])
-else:
-    # run
+def main():
     print(f'decrypt(encrypt(54654)) = {decrypt_bsgs(encrypt(54654))}')
+    print(
+        f'decrypt_bsgs(encrypt(100) + encrypt(100)) = {decrypt_bsgs(add(encrypt(100), encrypt(100)))}')
+
+
+if __name__ == "__main__":
+    main()
