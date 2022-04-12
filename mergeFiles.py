@@ -43,7 +43,7 @@ def merge2files(infile_names, outfile_name):
 
 
 def main():
-    infile_list = [("2", "1000000"), ("2000000", "3000000"),
+    infile_list = [("2", "25000"), ("50000", "75000"),
                    ("merge1", "merge2")]  # file to merge
     outfile_list = ["merge1", "merge2", "final"]  # names of the outfile
     assert len(infile_list) == len(outfile_list)

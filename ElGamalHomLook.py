@@ -1,7 +1,9 @@
 from petlib.ec import EcGroup
+from math import ceil, sqrt
 import linecache
+import random
 
-NUMBER_LINE_INFILE = 3999997
+NUMBER_LINE_INFILE = 100003
 FILE_NAME = "table_final"
 
 # EC setup
@@ -10,8 +12,9 @@ CURVENUMBER = 714
 group = EcGroup(CURVENUMBER)
 g = group.generator()
 o = group.order()
-# m = ceil(sqrt(o))
-m = 4000000
+sqrt_o = ceil(sqrt(o))
+m = 100000
+beta = o - m
 
 # key setup
 private_key = o.random()
@@ -24,10 +27,13 @@ def fastSearchInFile(data):
     hi = NUMBER_LINE_INFILE-1
     pre_line = ""
     curr_line = "0"
-    while pre_line != curr_line:
+    while 1:
         mid = (lo + hi) // 2
         curr_line = linecache.getline(FILE_NAME, mid).split(":")
-        if len(curr_line == 1):
+        if pre_line == curr_line:
+            break
+        pre_line = curr_line
+        if len(curr_line) == 1:
             continue
         cmp_value = curr_line[0]
         if data < cmp_value:
@@ -40,13 +46,14 @@ def fastSearchInFile(data):
 
 
 def bsgs_ecdlp(M):
-    if str(M) == "00":
-        return 0
-    if M == g:
-        return 1
     # Giant Step
-    for i in range(m):
-        temp = M - (i*m)*g
+    mg = m*g
+    for i in range(beta):
+        temp = M - (i*mg)
+        if str(temp) == "00":
+            return (i*m % o)
+        if temp == g:
+            return ((i*m + 1) % o)
         lookup_table_res = fastSearchInFile(temp)
         if lookup_table_res:
             return ((i*m + lookup_table_res) % o)
@@ -73,9 +80,16 @@ def add(elem1, elem2):
 
 
 def main():
-    print(f'decrypt(encrypt(54654)) = {decrypt_bsgs(encrypt(54654))}')
+    tests = [random.getrandbits(random.randint(16, 32)) for i in range(5)]
+    for test_number, test in enumerate(tests):
+        res = decrypt_bsgs(encrypt(test))
+        print(
+            f'test: {test_number+1} - decrypt(encrypt({test})) = {res} - {"Correct" if res == test else "Wrong"}')
+    rand1 = random.randint(0, len(tests)-1)
+    rand2 = random.randint(0, len(tests)-1)
+    res = decrypt_bsgs(add(encrypt(tests[rand1]), encrypt(tests[rand2])))
     print(
-        f'decrypt_bsgs(encrypt(100) + encrypt(100)) = {decrypt_bsgs(add(encrypt(100), encrypt(100)))}')
+        f'decrypt_bsgs(encrypt({tests[rand1]}) + encrypt({tests[rand2]})) = {res} - {"Correct" if res == (tests[rand1] + tests[rand2]) else "Wrong"}')
 
 
 if __name__ == "__main__":

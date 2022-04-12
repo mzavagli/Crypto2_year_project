@@ -13,7 +13,7 @@ group = EcGroup(CURVENUMBER)
 g = group.generator()
 o = group.order()
 # m = ceil(sqrt(o))
-m = 4000000
+m = 100000
 
 
 def generate_lookup_table(start, end, thread_name):
