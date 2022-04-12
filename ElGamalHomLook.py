@@ -27,6 +27,8 @@ def fastSearchInFile(data):
     while pre_line != curr_line:
         mid = (lo + hi) // 2
         curr_line = linecache.getline(FILE_NAME, mid).split(":")
+        if len(curr_line == 1):
+            continue
         cmp_value = curr_line[0]
         if data < cmp_value:
             hi = mid - 1
@@ -45,7 +47,6 @@ def bsgs_ecdlp(M):
     # Giant Step
     for i in range(m):
         temp = M - (i*m)*g
-        print(temp)
         lookup_table_res = fastSearchInFile(temp)
         if lookup_table_res:
             return ((i*m + lookup_table_res) % o)

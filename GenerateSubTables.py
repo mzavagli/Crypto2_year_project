@@ -24,9 +24,10 @@ def generate_lookup_table(start, end, thread_name):
     for i in range(start, end):
         curr_g += g
         lookup_table.append(f'{str(curr_g)}:{i}')
-    with open(f"table_{start}", "w") as f:
+    with open(f"table_{start}", "w") as outfile:
         lookup_table.sort()
-        f.write(os.linesep.join(lookup_table))
+        outfile.write(os.linesep.join(lookup_table))
+        outfile.write("\n")
 
 
 def main():
