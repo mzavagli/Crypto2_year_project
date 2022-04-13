@@ -51,7 +51,7 @@ def fastSearchInFile(data):
 
 def bsgs_ecdlp(M):
     # Giant Step
-    mg = m*g
+    mg = babystep_nb*g
     for i in range(giantstep_nb):
         temp = M - (i*mg)
         if str(temp) == "00":
@@ -85,8 +85,6 @@ def add(elem1, elem2):
 
 def main():
     tests = [random.getrandbits(random.randint(16, 32)) for i in range(5)]
-    tests.append(0)
-    tests.append(1)
     for test_number, test in enumerate(tests):
         res = decrypt_bsgs(encrypt(test))
         print(
