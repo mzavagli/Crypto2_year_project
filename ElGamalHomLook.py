@@ -2,6 +2,7 @@ from petlib.ec import EcGroup
 from math import ceil, sqrt
 import linecache
 import random
+import binascii
 
 NUMBER_LINE_INFILE = 100003
 FILE_NAME = "table_final"
@@ -26,7 +27,7 @@ public_key = private_key * g
 
 
 def fastSearchInFile(data):
-    data = str(data)
+    data = binascii.unhexlify(str(data))
     lo = 0
     hi = NUMBER_LINE_INFILE-1
     pre_line = ""
@@ -44,7 +45,7 @@ def fastSearchInFile(data):
         elif data > curr_line:
             lo = mid + 1
         else:
-            return int(f.read(4))
+            return int(binascii.hexlify(f.read(4)))
     return False
 
 
