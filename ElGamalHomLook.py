@@ -13,9 +13,9 @@ group = EcGroup(CURVENUMBER)
 g = group.generator()
 o = group.order()
 sqrt_o = ceil(sqrt(o))
-n = 256  # bits (curve property)
-alpha = 16
-beta = n - 16
+n = 32  # bits wanted ( here assuming values dont exceed 32bits )
+alpha = n // 2
+beta = n - alpha
 babystep_nb = 2**alpha
 giantstep_nb = 2**beta
 

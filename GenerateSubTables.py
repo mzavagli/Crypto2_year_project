@@ -12,7 +12,8 @@ CURVENUMBER = 714
 group = EcGroup(CURVENUMBER)
 g = group.generator()
 o = group.order()
-alpha = 16
+n = 32  # bits wanted ( here assuming values dont exceed 32bits )
+alpha = n // 2
 babystep_nb = 2**alpha
 
 
