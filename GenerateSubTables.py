@@ -12,8 +12,8 @@ CURVENUMBER = 714
 group = EcGroup(CURVENUMBER)
 g = group.generator()
 o = group.order()
-# m = ceil(sqrt(o))
-m = 100000
+alpha = 16
+babystep_nb = 2**alpha
 
 
 def generate_lookup_table(start, end, thread_name):
@@ -31,7 +31,7 @@ def generate_lookup_table(start, end, thread_name):
 
 
 def main():
-    divided_m = ceil(m/THREAD_NUMBER)
+    divided_m = ceil(babystep_nb/THREAD_NUMBER)
     with Pool(THREAD_NUMBER) as p:
         p.starmap(generate_lookup_table, [
             (i*divided_m, (i+1)*divided_m, f"process_{i}") for i in range(THREAD_NUMBER)])

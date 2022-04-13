@@ -13,8 +13,12 @@ group = EcGroup(CURVENUMBER)
 g = group.generator()
 o = group.order()
 sqrt_o = ceil(sqrt(o))
-m = 100000
-beta = o - m
+n = 256  # bits (curve property)
+alpha = 16
+beta = n - 16
+babystep_nb = 2**alpha
+giantstep_nb = 2**beta
+
 
 # key setup
 private_key = o.random()
@@ -48,15 +52,15 @@ def fastSearchInFile(data):
 def bsgs_ecdlp(M):
     # Giant Step
     mg = m*g
-    for i in range(beta):
+    for i in range(giantstep_nb):
         temp = M - (i*mg)
         if str(temp) == "00":
-            return (i*m % o)
+            return (i*babystep_nb % o)
         if temp == g:
-            return ((i*m + 1) % o)
+            return ((i*babystep_nb + 1) % o)
         lookup_table_res = fastSearchInFile(temp)
         if lookup_table_res:
-            return ((i*m + lookup_table_res) % o)
+            return ((i*babystep_nb + lookup_table_res) % o)
     return None
 
 
@@ -81,6 +85,8 @@ def add(elem1, elem2):
 
 def main():
     tests = [random.getrandbits(random.randint(16, 32)) for i in range(5)]
+    tests.append(0)
+    tests.append(1)
     for test_number, test in enumerate(tests):
         res = decrypt_bsgs(encrypt(test))
         print(
