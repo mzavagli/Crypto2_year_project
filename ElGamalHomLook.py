@@ -31,21 +31,20 @@ def fastSearchInFile(data):
     hi = NUMBER_LINE_INFILE-1
     pre_line = ""
     curr_line = "0"
+    f = open(FILE_NAME, "rb")
     while 1:
         mid = (lo + hi) // 2
-        curr_line = linecache.getline(FILE_NAME, mid).split(":")
+        f.seek(37*mid)
+        curr_line = f.read(33)
         if pre_line == curr_line:
             break
         pre_line = curr_line
-        if len(curr_line) == 1:
-            continue
-        cmp_value = curr_line[0]
-        if data < cmp_value:
+        if data < curr_line:
             hi = mid - 1
-        elif data > cmp_value:
+        elif data > curr_line:
             lo = mid + 1
         else:
-            return int(curr_line[1])
+            return int(f.read(4))
     return False
 
 
