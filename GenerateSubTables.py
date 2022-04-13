@@ -2,6 +2,7 @@ from petlib.ec import EcGroup
 import os
 from math import ceil, sqrt
 from multiprocessing import Pool
+import binascii
 
 
 THREAD_NUMBER = 4
@@ -24,11 +25,10 @@ def generate_lookup_table(start, end, thread_name):
     curr_g = (start-1)*g
     for i in range(start, end):
         curr_g += g
-        lookup_table.append(f'{str(curr_g)}:{i}')
-    with open(f"table_{start}", "w") as outfile:
+        lookup_table.append(binascii.unhexlify(f'{str(curr_g)}{str(i).zfill(8)}'))
+    with open(f"table_{start}", "wb") as f:
         lookup_table.sort()
-        outfile.write(os.linesep.join(lookup_table))
-        outfile.write("\n")
+        f.writelines(lookup_table)
 
 
 def main():

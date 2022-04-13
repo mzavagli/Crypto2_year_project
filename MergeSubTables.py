@@ -4,40 +4,33 @@ from os.path import exists
 
 # name of the 2 tabs to merge
 def merge2files(infile_names, outfile_name):
-    outfile = open(f'table_{outfile_name}', "w")  # name of the output file
-    pre1 = ""
-    pre2 = ""
-    line_file1 = "0"
-    line_file2 = "0"
+    outfile = open(f'{outfile_name}', "wb")  # name of the output file
+    value_1 = ""
+    value_2 = ""
+    i = 0
 
-    while (not exists(f'table_{infile_names[0]}')) or (not exists(f'table_{infile_names[1]}')):
-        time.sleep(2)
-
-    with open(f'table_{infile_names[0]}') as infile1, open(f'table_{infile_names[1]}') as infile2:
-        while 1:
-            if pre1 != line_file1:
-                line_file1 = infile1.readline()
-                pre1 = line_file1
-            if pre2 != line_file2:
-                line_file2 = infile2.readline()
-                pre2 = line_file2
-            if not line_file1:
-                if not line_file2:
-                    break
-                else:
-                    for line in infile2.readlines():
-                        outfile.write(f'{line}\n')
-                    break
-            if not line_file2:
-                for line in infile1.readlines():
-                    outfile.write(f'{line}\n')
-                break
-            if line_file1 < line_file2:
-                outfile.write(line_file1)
-                line_file1 = ""
+    with open(f'{infile_names[0]}', "rb") as infile1, open(f'{infile_names[1]}', "rb") as infile2:
+        value_1 = infile1.read(33)
+        value_2 = infile2.read(33)
+        while (value_1 or value_2) != b'':
+            if value_1 == b'':
+                while value_2 != b'':
+                    outfile.write(value_2)
+                    outfile.write(infile2.read(4))
+                    value_2 = infile2.read(33)
+            elif value_2 == b'':
+                while value_1 != b'':
+                    outfile.write(value_1)
+                    outfile.write(infile1.read(4))
+                    value_1 = infile1.read(33)
+            if value_1 < value_2 :
+                outfile.write(value_1)
+                outfile.write(infile1.read(4))
+                value_1 = infile1.read(33)
             else:
-                outfile.write(line_file2)
-                line_file2 = ""
+                outfile.write(value_2)
+                outfile.write(infile2.read(4))
+                value_2 = infile2.read(33)
 
     outfile.close()
 
@@ -52,4 +45,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    merge2files(["table_262144", "table_524288"], "table_merge")
