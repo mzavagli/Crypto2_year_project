@@ -1,10 +1,9 @@
 from petlib.ec import EcGroup
 from math import ceil, sqrt
-import linecache
 import random
 import binascii
 
-NUMBER_LINE_INFILE = 100003
+NUMBER_LINE_INFILE = 65534
 FILE_NAME = "table_final"
 
 # EC setup
@@ -26,24 +25,28 @@ private_key = o.random()
 public_key = private_key * g
 
 
-def fastSearchInFile(data):
+def fastSearchInFile(data, f):
     data = binascii.unhexlify(str(data))
     lo = 0
     hi = NUMBER_LINE_INFILE-1
     pre_line = ""
     curr_line = "0"
-    f = open(FILE_NAME, "rb")
+    # TODO check if in range
     while 1:
         mid = (lo + hi) // 2
-        f.seek(37*mid)
+        # print(mid)
+        try:
+            f.seek(37*mid)
+        except OSError:
+            break
         curr_line = f.read(33)
         if pre_line == curr_line:
             break
         pre_line = curr_line
         if data < curr_line:
-            hi = mid - 1
+            hi = abs(mid - 1)
         elif data > curr_line:
-            lo = mid + 1
+            lo = abs(mid + 1)
         else:
             return int(binascii.hexlify(f.read(4)))
     return False
@@ -51,16 +54,21 @@ def fastSearchInFile(data):
 
 def bsgs_ecdlp(M):
     # Giant Step
+    f = open(FILE_NAME, "rb")
     mg = babystep_nb*g
     for i in range(giantstep_nb):
         temp = M - (i*mg)
         if str(temp) == "00":
+            f.close()
             return (i*babystep_nb % o)
         if temp == g:
+            f.close()
             return ((i*babystep_nb + 1) % o)
-        lookup_table_res = fastSearchInFile(temp)
+        lookup_table_res = fastSearchInFile(temp, f)
         if lookup_table_res:
+            f.close()
             return ((i*babystep_nb + lookup_table_res) % o)
+    f.close()
     return None
 
 
@@ -84,7 +92,7 @@ def add(elem1, elem2):
 
 
 def main():
-    tests = [random.getrandbits(random.randint(16, 32)) for i in range(5)]
+    tests = [random.getrandbits(random.randint(16, 32)) for i in range(10)]
     for test_number, test in enumerate(tests):
         res = decrypt_bsgs(encrypt(test))
         print(

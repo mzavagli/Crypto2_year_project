@@ -1,0 +1,3 @@
+To implement/analyse: 
+    - initial truncation from q'*2^n -> T*2^n (3)
+    - 

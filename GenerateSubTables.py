@@ -18,23 +18,28 @@ alpha = n // 2
 babystep_nb = 2**alpha
 
 
-def generate_lookup_table(start, end, thread_name):
+def generateLookupTable(start, end, thread_name):
     lookup_table = []
     if start == 0:
         start = 2
     curr_g = (start-1)*g
     for i in range(start, end):
         curr_g += g
-        lookup_table.append(binascii.unhexlify(f'{str(curr_g)}{str(i).zfill(8)}'))
+        lookup_table.append(binascii.unhexlify(
+            f'{str(curr_g)}{str(i).zfill(8)}'))
     with open(f"table_{start}", "wb") as f:
         lookup_table.sort()
         f.writelines(lookup_table)
 
 
+def generateTruncTable():
+    return True
+
+
 def main():
     divided_m = ceil(babystep_nb/THREAD_NUMBER)
     with Pool(THREAD_NUMBER) as p:
-        p.starmap(generate_lookup_table, [
+        p.starmap(generateLookupTable, [
             (i*divided_m, (i+1)*divided_m, f"process_{i}") for i in range(THREAD_NUMBER)])
 
 
