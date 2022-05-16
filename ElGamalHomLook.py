@@ -6,6 +6,9 @@ import binascii
 NUMBER_LINE_INFILE = 65534
 FILE_NAME = "table_final"
 
+TAU = 10
+INDEX_SIZE = 4
+
 # EC setup
 CURVENUMBER = 714
 
@@ -26,7 +29,7 @@ public_key = private_key * g
 
 
 def fastSearchInFile(data, f):
-    data = binascii.unhexlify(str(data))
+    data = binascii.unhexlify(str(data)[:2*TAU])
     lo = 0
     hi = NUMBER_LINE_INFILE-1
     pre_line = ""
@@ -36,10 +39,10 @@ def fastSearchInFile(data, f):
         mid = (lo + hi) // 2
         # print(mid)
         try:
-            f.seek(37*mid)
+            f.seek((TAU+INDEX_SIZE)*mid)
         except OSError:
             break
-        curr_line = f.read(33)
+        curr_line = f.read(TAU)
         if pre_line == curr_line:
             break
         pre_line = curr_line
@@ -48,7 +51,7 @@ def fastSearchInFile(data, f):
         elif data > curr_line:
             lo = abs(mid + 1)
         else:
-            return int(binascii.hexlify(f.read(4)))
+            return int(binascii.hexlify(f.read(INDEX_SIZE)))
     return False
 
 

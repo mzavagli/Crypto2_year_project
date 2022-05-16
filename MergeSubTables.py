@@ -1,5 +1,5 @@
-import time
-from os.path import exists
+TAU = 10
+INDEX_SIZE = 4
 
 
 # name of the 2 tabs to merge
@@ -9,28 +9,27 @@ def merge2files(infile_names, outfile_name):
     value_2 = ""
 
     with open(f'table_{infile_names[0]}', "rb") as infile1, open(f'table_{infile_names[1]}', "rb") as infile2:
-        value_1 = infile1.read(33)
-        value_2 = infile2.read(33)
+        value_1 = infile1.read(TAU)
+        value_2 = infile2.read(TAU)
         while (value_1 or value_2) != b'':
             if value_1 == b'':
                 while value_2 != b'':
                     outfile.write(value_2)
-                    outfile.write(infile2.read(4))
-                    value_2 = infile2.read(33)
+                    outfile.write(infile2.read(INDEX_SIZE))
+                    value_2 = infile2.read(TAU)
             elif value_2 == b'':
                 while value_1 != b'':
                     outfile.write(value_1)
-                    outfile.write(infile1.read(4))
-                    value_1 = infile1.read(33)
+                    outfile.write(infile1.read(INDEX_SIZE))
+                    value_1 = infile1.read(TAU)
             if value_1 < value_2:
                 outfile.write(value_1)
-                outfile.write(infile1.read(4))
-                value_1 = infile1.read(33)
+                outfile.write(infile1.read(INDEX_SIZE))
+                value_1 = infile1.read(TAU)
             else:
                 outfile.write(value_2)
-                outfile.write(infile2.read(4))
-                value_2 = infile2.read(33)
-
+                outfile.write(infile2.read(INDEX_SIZE))
+                value_2 = infile2.read(TAU)
     outfile.close()
 
 

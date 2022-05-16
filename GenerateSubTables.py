@@ -1,11 +1,11 @@
 from petlib.ec import EcGroup
-import os
-from math import ceil, sqrt
+from math import ceil
 from multiprocessing import Pool
 import binascii
 
 
 THREAD_NUMBER = 4
+TAU = 10  # 10 bytes -> 80 bits
 
 # EC setup
 CURVENUMBER = 714
@@ -26,14 +26,10 @@ def generateLookupTable(start, end, thread_name):
     for i in range(start, end):
         curr_g += g
         lookup_table.append(binascii.unhexlify(
-            f'{str(curr_g)}{str(i).zfill(8)}'))
+            f'{str(curr_g)[:2*TAU]}{str(i).zfill(8)}'))
     with open(f"table_{start}", "wb") as f:
         lookup_table.sort()
         f.writelines(lookup_table)
-
-
-def generateTruncTable():
-    return True
 
 
 def main():
