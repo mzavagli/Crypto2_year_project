@@ -131,6 +131,7 @@ dmypy.json
 
 # Tables
 table_*
+tau_*
 
 # IDE 
 .vscode/
