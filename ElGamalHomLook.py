@@ -2,6 +2,7 @@ from petlib.ec import EcGroup
 from math import ceil, sqrt
 import random
 import binascii
+import os
 
 NUMBER_LINE_INFILE = 65534
 FILE_NAME = "table_final"
@@ -28,8 +29,8 @@ private_key = o.random()
 public_key = private_key * g
 
 
-def fastSearchInFile(data, f):
-    data = binascii.unhexlify(str(data)[:2*TAU])
+def fastSearchInFile(data, f, tau):
+    data = binascii.unhexlify(str(data)[:2*tau])
     lo = 0
     hi = NUMBER_LINE_INFILE-1
     pre_line = ""
@@ -39,10 +40,10 @@ def fastSearchInFile(data, f):
         mid = (lo + hi) // 2
         # print(mid)
         try:
-            f.seek((TAU+INDEX_SIZE)*mid)
+            f.seek((tau+INDEX_SIZE)*mid)
         except OSError:
             break
-        curr_line = f.read(TAU)
+        curr_line = f.read(tau)
         if pre_line == curr_line:
             break
         pre_line = curr_line
@@ -53,6 +54,15 @@ def fastSearchInFile(data, f):
         else:
             return int(binascii.hexlify(f.read(INDEX_SIZE)))
     return False
+
+
+def decryptVarTruncate(data):
+    for file in os.listdir("."):
+        if file.startswith("tau_"):
+            f = open(file, "rb")
+            result = fastSearchInFile(data, f, int(file[4:]))
+            if result:
+                return result
 
 
 def bsgs_ecdlp(M):
