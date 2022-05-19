@@ -1,3 +1,4 @@
+from os import urandom
 from petlib.ec import EcGroup
 from math import ceil
 from multiprocessing import Pool
@@ -31,6 +32,39 @@ def generateLookupTable(start, end, thread_name):
         lookup_table.sort()
         f.writelines(lookup_table)
 
+
+def VarTruncate(tau_start, tau_stop, file):
+    curr_g = 0
+    B = []
+    C = [0 for _ in range(2**alpha)]
+
+    for i in range(2**alpha):
+        B.append(curr_g)
+        curr_g += g
+    
+    for tau in range(tau_stop, tau_start, -1):
+        A_tau = []
+        for i, elem in enumerate(file):
+            if i > (2**alpha): # not sure
+                A_tau.append(elem[tau])
+        for index, elem in enumerate(B):
+            if C[index] == 0:
+                if elem[tau] in A_tau:
+                    C[index] = tau
+
+    for tau in range(tau_stop, tau_start, -1):
+        B_tau = {}
+        for elem in B:
+            if elem[tau] not in B_tau:
+                B_tau[elem[tau]] = False
+            else:
+                B_tau[elem[tau]] = True
+
+        for index, elem in enumerate(B):
+            if (B_tau[elem[tau]] == True) and (C[index] < tau):
+                C[index] = tau
+    
+    return C
 
 def main():
     divided_m = ceil(babystep_nb/THREAD_NUMBER)
