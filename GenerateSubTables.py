@@ -1,3 +1,5 @@
+from math import ceil
+from multiprocessing import Pool
 from petlib.ec import EcGroup
 import binascii
 import os
@@ -90,11 +92,11 @@ def CreateLookupTable(tau_start, tau_stop, file):
 
 
 def main():
-    # divided_m = ceil(2**n/THREAD_NUMBER)
-    # with Pool(THREAD_NUMBER) as p:
-    #     p.starmap(generateLookupTable, [
-    #         (i*divided_m, (i+1)*divided_m, f"process_{i}") for i in range(THREAD_NUMBER)])
-    CreateLookupTable(0, 15, "table_final")
+    divided_m = ceil(2**n/THREAD_NUMBER)
+    with Pool(THREAD_NUMBER) as p:
+        p.starmap(generateLookupTable, [
+            (i*divided_m, (i+1)*divided_m, f"process_{i}") for i in range(THREAD_NUMBER)])
+    # CreateLookupTable(0, 15, "table_final")
 
 
 main()
