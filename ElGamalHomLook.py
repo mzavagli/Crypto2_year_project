@@ -2,7 +2,10 @@ from petlib.ec import EcGroup
 from math import ceil, sqrt
 import random
 import binascii
-import os
+from statistics import stdev, mean
+import time
+
+SAMPLE_NUMBER = 5
 
 NUMBER_LINE_INFILE = 65534
 FILE_NAME = "table_final"
@@ -77,7 +80,7 @@ def bsgs_ecdlp(M):
         if temp == g:
             f.close()
             return ((i*babystep_nb + 1) % o)
-        lookup_table_res = fastSearchInFile(temp, f)
+        lookup_table_res = fastSearchInFile(temp, f, TAU)
         if lookup_table_res:
             f.close()
             return ((i*babystep_nb + lookup_table_res) % o)
@@ -105,16 +108,26 @@ def add(elem1, elem2):
 
 
 def main():
-    tests = [random.getrandbits(random.randint(16, 32)) for i in range(10)]
-    for test_number, test in enumerate(tests):
-        res = decrypt_bsgs(encrypt(test))
+    times = []
+    tests = [[random.getrandbits(random.randint(16, 32))
+              for i in range(10)] for i in range(SAMPLE_NUMBER)]
+    for i in range(SAMPLE_NUMBER):
+        start = time.time()
+        for test_number, test in enumerate(tests[i]):
+            res = decrypt_bsgs(encrypt(test))
+            print(
+                f'test: {test_number+1} - decrypt(encrypt({test})) = {res} - {"Correct" if res == test else "Wrong"}')
+        res = decrypt_bsgs(
+            add(encrypt(tests[i][0]), encrypt(tests[i][1])))
         print(
-            f'test: {test_number+1} - decrypt(encrypt({test})) = {res} - {"Correct" if res == test else "Wrong"}')
-    rand1 = random.randint(0, len(tests)-1)
-    rand2 = random.randint(0, len(tests)-1)
-    res = decrypt_bsgs(add(encrypt(tests[rand1]), encrypt(tests[rand2])))
-    print(
-        f'decrypt_bsgs(encrypt({tests[rand1]}) + encrypt({tests[rand2]})) = {res} - {"Correct" if res == (tests[rand1] + tests[rand2]) else "Wrong"}')
+            f'decrypt_bsgs(encrypt({tests[i][0]}) + encrypt({tests[i][1]})) = {res} - {"Correct" if res == (tests[i][0] + tests[i][1]) else "Wrong"}')
+        end = time.time()
+        times.append(end - start)
+
+    # stats
+    print(f"Times results: {times}")
+    print(f"Mean time: {mean(times)}")
+    print(f"Standard deviation: {stdev(times)}")
 
 
 if __name__ == "__main__":

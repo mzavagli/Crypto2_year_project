@@ -6,7 +6,7 @@ import os
 
 
 THREAD_NUMBER = 4
-TAU = 33  # 10 bytes -> 80 bits
+TAU = 10  # 10 bytes -> 80 bits
 INDEX_SIZE = 4
 
 # EC setup
