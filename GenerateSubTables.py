@@ -96,7 +96,7 @@ def main():
     with Pool(THREAD_NUMBER) as p:
         p.starmap(generateLookupTable, [
             (i*divided_m, (i+1)*divided_m, f"process_{i}") for i in range(THREAD_NUMBER)])
-    # CreateLookupTable(0, 15, "table_final")
+    # CreateLookupTable(0, 10, "table_final")
 
 
 main()
